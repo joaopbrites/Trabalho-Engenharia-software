@@ -4,6 +4,7 @@ export interface ITutor {
     id: string;
     nome: string;
     telefone: string;
+    email: string;
     endereco: string;
     ativo: boolean;
 }
@@ -20,7 +21,9 @@ export interface IAnimal {
 export interface IConsulta {
     id: string;
     animalId: string;
-    data_consulta: string; // ou Date, dependendo da sua implementação
+    data_consulta: string; // ISO string para compatibilidade com SQLite
+    motivo?: string;
+    observacoes?: string;
     encerrada: boolean;
 }
 
@@ -29,5 +32,5 @@ export interface IVacinaAplicada {
     animalId: string;
     consultaId: string;
     nome_vacina: string;
-    data_aplicacao: string; // ou Date
+    data_aplicacao: string; // ISO string para compatibilidade com SQLite
 }

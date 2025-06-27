@@ -10,7 +10,7 @@ export default function ModalFormConsulta({ isOpen, onClose, mode, onSubmit, ini
     useEffect(() => {
         if (initialData) {
             setAnimalId(initialData.animalId || '');
-            setData(initialData.data ? initialData.data.slice(0, 10) : ''); // Assume ISO
+            setData(initialData.data_consulta ? initialData.data_consulta.slice(0, 10) : ''); // Assume ISO
             setMotivo(initialData.motivo || '');
             setObservacoes(initialData.observacoes || '');
             setEncerrada(initialData.encerrada || false);
@@ -22,7 +22,11 @@ export default function ModalFormConsulta({ isOpen, onClose, mode, onSubmit, ini
     const handleSubmit = (e) => {
         e.preventDefault();
         onSubmit({
-            animalId, data, motivo, observacoes, encerrada,
+            animalId, 
+            data_consulta: data, 
+            motivo, 
+            observacoes, 
+            encerrada,
         });
     };
 

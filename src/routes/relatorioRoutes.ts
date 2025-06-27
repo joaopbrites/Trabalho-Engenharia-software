@@ -4,7 +4,9 @@ import { RelatorioController } from '../controllers/RelatorioController';
 
 const router = Router();
 
-router.get('/relatorios/tutores/:tutorId/vacinas', RelatorioController.vacinasPorTutor);
-router.get('/relatorios/tutores/:tutorId/consultas', RelatorioController.consultasPorTutor);
+router.get('/tutores/vacinas', RelatorioController.vacinasPorTodosTutores);
+router.get('/tutores/consultas', RelatorioController.consultasPorTodosTutores);
+router.get('/tutores/:tutorId/vacinas', RelatorioController.vacinasPorTutor);
+router.get('/tutores/:tutorId/consultas', RelatorioController.consultasPorTutor);
 
 export default router;

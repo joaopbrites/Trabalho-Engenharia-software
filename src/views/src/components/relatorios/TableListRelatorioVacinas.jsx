@@ -1,24 +1,31 @@
-import React from "react";
-
-// Exemplo de dados mockados. Substitua por fetch real depois.
-const mockData = [
-  {
-    tutor: { id: "1", nome: "João" },
-    animais: [
-      {
-        id: "a1",
-        nome: "Rex",
-        vacinas: [
-          { id: "v1", nome_vacina: "Raiva", data_aplicacao: "2024-01-10" },
-          { id: "v2", nome_vacina: "V10", data_aplicacao: "2024-03-15" },
-        ],
-      },
-    ],
-  },
-];
+import React, { useEffect, useState } from "react";
+import { getRelatorioVacinasTodosTutores } from "../../api/relatorios";
 
 export default function TableListRelatorioVacinas() {
-  // Troque mockData por dados vindos da API futuramente
+  const [dados, setDados] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      setErro(null);
+      try {
+        const data = await getRelatorioVacinasTodosTutores();
+        setDados(Array.isArray(data) ? data : []);
+      } catch (e) {
+        setErro("Erro ao buscar relatório de vacinas");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  if (loading) return <div>Carregando...</div>;
+  if (erro) return <div>{erro}</div>;
+  if (!dados.length) return <div>Nenhum dado encontrado.</div>;
+
   return (
     <div className="overflow-x-auto">
       <table className="table w-full">
@@ -31,7 +38,7 @@ export default function TableListRelatorioVacinas() {
           </tr>
         </thead>
         <tbody>
-          {mockData.map((rel) =>
+          {dados.map((rel) =>
             rel.animais.map((animal) =>
               animal.vacinas.map((vacina) => (
                 <tr key={vacina.id}>

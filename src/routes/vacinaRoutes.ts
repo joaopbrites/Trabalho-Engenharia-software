@@ -9,44 +9,50 @@ const vacinaAplicadaController = new VacinaAplicadaController();
 const consultaController = new ConsultaController();
 const animalController = new AnimalController();
 // RF18: Cadastro de Vacina Aplicada
-router.post("/", (req: Request, res: Response) => {
-  const animalExists = (id: string) => !!animalController.read(id);
-  const consultaExists = (id: string) => !!consultaController.read(id);
-  const result = vacinaAplicadaController.create(req.body, animalExists, consultaExists);
+router.post("/", async (req: Request, res: Response) => {
+  const animalExists = async (id: string) => {
+    const animal = await animalController.read(id);
+    return !("error" in animal);
+  };
+  const consultaExists = async (id: string) => {
+    const consulta = await consultaController.read(id);
+    return !("error" in consulta);
+  };
+  const result = await vacinaAplicadaController.create(req.body, animalExists, consultaExists);
   if ("error" in result) return res.status(400).json(result);
   res.status(201).json(result);
 });
 
 // RF19: Consulta de Vacina Aplicada
-router.get("/:id", (req: Request, res: Response) => {
-  const result = vacinaAplicadaController.read(req.params.id);
+router.get("/:id", async (req: Request, res: Response) => {
+  const result = await vacinaAplicadaController.read(req.params.id);
   if ("error" in result) return res.status(404).json(result);
   res.json(result);
 });
 
 // RF20: Listagem de Vacinas Aplicadas
-router.get("/", (_req: Request, res: Response) => {
-  const result = vacinaAplicadaController.list();
+router.get("/", async (_req: Request, res: Response) => {
+  const result = await vacinaAplicadaController.list();
   res.json(result);
 });
 
 // RF21: Atualização de Vacina Aplicada
-router.patch("/:id", (req: Request, res: Response) => {
-  const result = vacinaAplicadaController.update(req.params.id, req.body);
+router.patch("/:id", async (req: Request, res: Response) => {
+  const result = await vacinaAplicadaController.update(req.params.id, req.body);
   if ("error" in result) return res.status(400).json(result);
   res.json(result);
 });
 
 // RF22: Remoção de Vacina Aplicada
-router.delete("/:id", (req: Request, res: Response) => {
-  const result = vacinaAplicadaController.delete(req.params.id);
+router.delete("/:id", async (req: Request, res: Response) => {
+  const result = await vacinaAplicadaController.delete(req.params.id);
   if (!result.success) return res.status(400).json(result);
   res.json(result);
 });
 
 // RF23: Listar Vacinas Aplicadas por Animal
-router.get("/animal/:animalId", (req: Request, res: Response) => {
-  const result = vacinaAplicadaController.listByAnimal(req.params.animalId);
+router.get("/animal/:animalId", async (req: Request, res: Response) => {
+  const result = await vacinaAplicadaController.listByAnimal(req.params.animalId);
   if ("error" in result) return res.status(404).json(result);
   res.json(result);
 });

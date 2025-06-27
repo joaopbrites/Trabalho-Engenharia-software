@@ -1,5 +1,5 @@
 import axios from "axios";
-const API_URL = "http://localhost:8080";
+const API_URL = "http://localhost:3001";
 
 // Animais
 export async function getAnimais() {

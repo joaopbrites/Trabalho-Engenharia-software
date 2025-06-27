@@ -10,44 +10,70 @@ export class ConsultaController {
         this.model = model ?? new ConsultaModel();
     }
 
-    public create(
+    public async create(
         data: CreateConsultaDTO,
-        animalExistsFn: (id: string) => boolean
-    ): IConsulta | { error: string } {
-        if (!data || !data.animalId || !data.data) return { error: "Dados obrigatórios ausentes" };
-        if (!animalExistsFn(data.animalId)) return { error: "Animal não existe" };
-        const consulta = this.model.create(data, animalExistsFn);
-        if (!consulta) return { error: "Não foi possível criar consulta" };
-        return consulta;
+        animalExistsFn: (id: string) => Promise<boolean>
+    ): Promise<IConsulta | { error: string }> {
+        if (!data || !data.animalId || !data.data_consulta) return { error: "Dados obrigatórios ausentes" };
+        try {
+            const animalExists = await animalExistsFn(data.animalId);
+            if (!animalExists) return { error: "Animal não existe" };
+            const consulta = await this.model.create(data, animalExistsFn);
+            if (!consulta) return { error: "Não foi possível criar consulta" };
+            return consulta;
+        } catch (error) {
+            return { error: `Creation failed: ${error}` };
+        }
     }
 
-    public read(id: string): IConsulta | { error: string } {
+    public async read(id: string): Promise<IConsulta | { error: string }> {
         if (!id) return { error: "Id ausente" };
-        const consulta = this.model.read(id);
-        if (!consulta) return { error: "Consulta não encontrada" };
-        return consulta;
+        try {
+            const consulta = await this.model.read(id);
+            if (!consulta) return { error: "Consulta não encontrada" };
+            return consulta;
+        } catch (error) {
+            return { error: `Read failed: ${error}` };
+        }
     }
 
-    public list(): IConsulta[] {
-        return this.model.list();
+    public async list(): Promise<IConsulta[]> {
+        try {
+            return await this.model.list();
+        } catch (error) {
+            console.error('List failed:', error);
+            return [];
+        }
     }
 
-    public update(id: string, data: UpdateConsultaDTO): IConsulta | { error: string } {
+    public async update(id: string, data: UpdateConsultaDTO): Promise<IConsulta | { error: string }> {
         if (!id) return { error: "Id ausente" };
-        const updated = this.model.update(id, data);
-        if (!updated) return { error: "Consulta não encontrada ou não atualizada" };
-        return updated;
+        try {
+            const updated = await this.model.update(id, data);
+            if (!updated) return { error: "Consulta não encontrada ou não atualizada" };
+            return updated;
+        } catch (error) {
+            return { error: `Update failed: ${error}` };
+        }
     }
 
-    public delete(id: string): { success: boolean; error?: string } {
+    public async delete(id: string): Promise<{ success: boolean; error?: string }> {
         if (!id) return { success: false, error: "Invalid id" };
-        const ok = this.model.delete(id);
-        if (!ok) return { success: false, error: "Not found" };
-        return { success: true };
+        try {
+            const ok = await this.model.delete(id);
+            if (!ok) return { success: false, error: "Not found" };
+            return { success: true };
+        } catch (error) {
+            return { success: false, error: `Deletion failed: ${error}` };
+        }
     }
 
-    public listByAnimal(animalId: string): IConsulta[] | { error: string } {
+    public async listByAnimal(animalId: string): Promise<IConsulta[] | { error: string }> {
         if (!animalId) return { error: "animalId ausente" };
-        return this.model.listByAnimal(animalId);
+        try {
+            return await this.model.listByAnimal(animalId);
+        } catch (error) {
+            return { error: `List by animal failed: ${error}` };
+        }
     }
 }

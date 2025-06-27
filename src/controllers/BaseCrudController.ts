@@ -1,29 +1,46 @@
 export abstract class BaseCrudController<T, CreateDTO, UpdateDTO> {
     protected abstract model: any;
 
-    public create(data: CreateDTO, ...args: any[]): T | { error: string } {
+    public async create(data: CreateDTO, ...args: any[]): Promise<T | { error: string }> {
         if (!this.validateCreate(data, ...args)) return { error: "Invalid data" };
-        const result = this.model.create(data, ...args);
-        if (!result) return { error: "Creation failed" };
-        return result;
+        try {
+            const result = await this.model.create(data, ...args);
+            if (!result) return { error: "Creation failed" };
+            return result;
+        } catch (error) {
+            return { error: `Creation failed: ${error}` };
+        }
     }
 
-    public read(id: string): T | { error: string } {
+    public async read(id: string): Promise<T | { error: string }> {
         if (!id) return { error: "Invalid id" };
-        const result = this.model.read(id);
-        if (!result) return { error: "Not found" };
-        return result;
+        try {
+            const result = await this.model.read(id);
+            if (!result) return { error: "Not found" };
+            return result;
+        } catch (error) {
+            return { error: `Read failed: ${error}` };
+        }
     }
 
-    public list(...args: any[]): T[] {
-        return this.model.list(...args) || [];
+    public async list(...args: any[]): Promise<T[]> {
+        try {
+            return await this.model.list(...args) || [];
+        } catch (error) {
+            console.error('List failed:', error);
+            return [];
+        }
     }
 
-    public update(id: string, data: UpdateDTO): T | { error: string } {
+    public async update(id: string, data: UpdateDTO): Promise<T | { error: string }> {
         if (!id || !this.validateUpdate(data)) return { error: "Invalid data" };
-        const result = this.model.update(id, data);
-        if (!result) return { error: "Update failed" };
-        return result;
+        try {
+            const result = await this.model.update(id, data);
+            if (!result) return { error: "Update failed" };
+            return result;
+        } catch (error) {
+            return { error: `Update failed: ${error}` };
+        }
     }
 
     protected validateCreate(data: CreateDTO, ...args: any[]): boolean {
